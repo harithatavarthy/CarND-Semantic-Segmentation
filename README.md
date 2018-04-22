@@ -6,6 +6,7 @@
 [image_Decoder]: ./images/SemanticSegmentation_Decoder.png
 [image_loss]: ./images/Loss.png
 [image_accuracy]: ./images/Accuracy.png
+[image_gif]: ./images/Webp.net-gifmaker.gif
 
 
 ## Introduction
@@ -63,9 +64,13 @@ As training set I used the [Kitti Road dataset](http://www.cvlibs.net/datasets/k
 In order to arrive at the optimal model, i trained the model several times with multiple combinations of the above hyperparameters with varied values. Below are some of the observations.
 
 a. With a bigger batch size, time taken for each iteration of training was less but the number of iterations required to arrive at high levels of accuracy was more
+
 b. Smaller batch size resulted in iterations with increased divergence in training loss making it unreliable.
+
 c. Higher values for L2_REG resulted in increased penalization of features resulting in losing valuable information
+
 d. Lower values for L2_REG resulted in noise
+
 e. Very low values for learning rate increased the overall training time
 
 
@@ -83,11 +88,11 @@ tensorboard --logdir=tensorboard_log/
 ## Results
 The FCN classifies the road area quite well. It has some trouble to determine the road area in rail sections or in scenes with heavy cast shadows. This is due to the fact, that the training set with only 289 images is very small and not all scenarios in the test set are covered by the training set. By applying bigger training sets or image augmentation the performance could be further improved.
 
-![Results GIF][image_results]
+![Results GIF][image_gif]
 
 
 #--------------------------------------------------------------------------------------------------------------
-
+#UDACITY README
 
 # Semantic Segmentation
 ### Introduction
