@@ -26,21 +26,16 @@ The Fully Convolutional Network (FCN) is based on a pre-rained VGG-16 image clas
 Each convolution `conv2d()`and `conv2d_transpose()` of the decoder has been setup with a kernel initializer (`tf.truncated_normal_initializer`) and a kernel regularizer (`tf.contrib.layers.l2_regularizer`). This will ensure quick convergence of training loss as well as elimination of features that are least importance for learning.
 
 ## Training on AWS EC2 Instance
-The FCN has been trained on an Amazon Web Services (AWS) EC2 g2.2xlarge instance with the following hardware configuration.
+The FCN has been trained on an Amazon Web Services (AWS) EC2 g3.4xlarge instance with the following hardware configuration.
 
-- 8 vCPUs (Intel Xeon E5-2670)
-- 1 GPU (NVIDIA 1536 CUDA processor with 4 GB video RAM)
-- 15 GB RAM
-- 60 GB SSD
+- 16 vCPUs (Intel Xeon E5-2670)
+- 1 GPU (Nvidia Tesla M60)
+- 7.5 GB RAM
+- 100 GB SSD
 
-To setup the EC2 instance with python v3.5.2, tensorflow v1.4 and all dependencies, I created an anaconda environment file [environment.yml](https://github.com/SvenMuc/CarND-Semantic-Segmentation-P12/blob/master/environment.yml) which creates the `carnd-term3` environment.
+I have created this EC2 using  community AMI provided by udacity-carnd-advanced-deep-learning (ami-effbaa94).
+By using this AMI, one need not worry about complexity invovled in creating the environment required to train and run the model.
 
-The following command prepares the anaconda environment:
-```
-conda env create -f environment.yml
-```
-
-The [install_data.sh](https://github.com/SvenMuc/CarND-Semantic-Segmentation-P12/blob/master/install_data.sh) script downloads the pre-trained VGG-16 network and the KITTI road dataset. Now everything is prepared to start the training.
 
 ### Training Set
 As training set I used the [Kitti Road dataset](http://www.cvlibs.net/datasets/kitti/eval_road.php) from [here](http://www.cvlibs.net/download.php?file=data_road.zip). It consists of 289 training and 290 test images. Furhter details can be found in the [ITCS 2013 publication](http://www.cvlibs.net/publications/Fritsch2013ITSC.pdf) from Jannik Fritsch, Tobias Kühnl, Andreas Geiger.
@@ -53,26 +48,33 @@ As training set I used the [Kitti Road dataset](http://www.cvlibs.net/datasets/k
 | URBAN        |  289   |  290  | total (all three subsets)  |
 
 ### Hyper-Parameters
-Due to the limited video RAM the batch size has been limited to 2. The total training time for 289 training samples took 1h and 18 min for 20 epochs.
+ The total training time for 289 training samples took about 2 hours end to end using the below values for the hyper parameters
 
 | Parameter           |  Value  |
 |:--------------------|:-------:|
-| KERNEL_INIT_STD_DEV |  0.001  |
-| L2_REG              | 0.00001 |
+| KERNEL_INIT_STD_DEV |  0.01   |
+| L2_REG              |  1e-3   |
 | KEEP_PROB           |   0.5   |
-| LEARNING_RATE       | 0.0001  |
-| EPOCHS              |   20    |
-| BATCH_SIZE          |    2    |
+| LEARNING_RATE       | 0.0009  |
+| EPOCHS              |   50    |
+| BATCH_SIZE          |    5    |
 
-### Cross Entropy Loss and IoU - Intersection-over-Union
-In order to find the best model, I saved the trained model after each epoch and observed the cross entropy loss and IoU (Intersection-over-Union) values. The IoU values are calculated in the [`main.py`in line 180](https://github.com/SvenMuc/CarND-Semantic-Segmentation-P12/blob/0d8cc5ef1a61073c2fd31f0a7e2849edfbf5d415/main.py#L180).
 
-As depicted in the two diagrams below the cross entropy loss value increased drastically after epoch 18 whereby the IoU value saturates. Therefore, I choose the trained model after epoch 18.
+In order to arrive at the optimal model, i trained the model several times with multiple combinations of the above hyperparameters with varied values. Below are some of the observations.
+
+a. With a bigger batch size, time taken for each iteration of training was less but the number of iterations required to arrive at high levels of accuracy was more
+b. Smaller batch size resulted in iterations with increased divergence in training loss making it unreliable.
+c. Higher values for L2_REG resulted in increased penalization of features resulting in losing valuable information
+d. Lower values for L2_REG resulted in noise
+e. Very low values for learning rate increased the overall training time
+
+
+The two diagrams below depict the decrease in cross entropy loss over time and increase in accuracy over time.
 
 ![loss][image_loss] ![accuracy][image_accuracy]
 
 ### Tensorboard
-In order to visualize the FCN graph, the cross entropy and intersection-over-union progress I added several summary operations into the model and training methods. All relevant TensorBoard log files are stored in the `tensorboard_log` directory. The TensorBoard can be started with the following command. 
+In order to visualize the FCN graph, the cross entropy, Accuracy and intersection-over-union progress I added several summary operations into the model and training methods. All relevant TensorBoard log files are stored in the `tensorboard_log` directory. The TensorBoard can be started with the following command. 
 
 ```
 tensorboard --logdir=tensorboard_log/
