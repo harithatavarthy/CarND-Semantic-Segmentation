@@ -91,8 +91,8 @@ The FCN classifies the road area quite well. It has some trouble to determine th
 ![Results GIF][image_gif]
 
 
-#--------------------------------------------------------------------------------------------------------------
-#UDACITY README
+# --------------------------------------------------------------------------------------------------------------
+# UDACITY README
 
 # Semantic Segmentation
 ### Introduction
