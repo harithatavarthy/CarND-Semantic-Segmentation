@@ -9,7 +9,9 @@
 
 
 ## Introduction
-In this project, the goal is to label the pixels of a road in images using a Fully Convolutional Network (FCN) as described in the paper [Fully Convolutional Networks for Semantic Segmentation](https://people.eecs.berkeley.edu/%7Ejonlong/long_shelhamer_fcn.pdf) by Jonathan Long, Evan Shelhamer, and Trevor Darrell from UC Berkeley. The projects is based on [Udacity's starter project](https://github.com/darienmt/CarND-Semantic-Segmentation-P2).
+The goal of this project is to label the pixels of a road in the given testimages with about 80% accuracy, using a Fully Convolutional Network (FCN).  as described in the paper [Fully Convolutional Networks for Semantic Segmentation](https://people.eecs.berkeley.edu/%7Ejonlong/long_shelhamer_fcn.pdf) by Jonathan Long, Evan Shelhamer, and Trevor Darrell from UC Berkeley. The projects is based on [Udacity's starter project](https://github.com/darienmt/CarND-Semantic-Segmentation-P2).
+
+A semantic segmentation  model is build on top of a VGG-16 image classifer to retain the spatial information and then upsample to the original image size. Once the model is build, it has been trained by tuning hyper parameters in such a way that the overall loss of the model is minimized. After model is trained to reasonably sufficient levels, inferences are made against the test data/images.
 
 The following image shows exemplarily the result of the VGG-16 based FCN which has been trained to determine road (green) and non-road (not marked) areas.
 
@@ -17,18 +19,11 @@ The following image shows exemplarily the result of the VGG-16 based FCN which h
 
 ## Fully Convolutional Network (FCN) Architecture
 
-The Fully Convolutional Network (FCN) is based on a pre-rained VGG-16 image classification network. The VGG-16 network acts as a encoder. In order to implement the decoder, I extracted layer 3, 4 and 7 from the VGG-16 ([`main.py` line 80](https://github.com/SvenMuc/CarND-Semantic-Segmentation-P12/blob/0d8cc5ef1a61073c2fd31f0a7e2849edfbf5d415/main.py#L80)) network and implemented several upsampling and skip connections ([`main.py` line 102](https://github.com/SvenMuc/CarND-Semantic-Segmentation-P12/blob/0d8cc5ef1a61073c2fd31f0a7e2849edfbf5d415/main.py#L102)). The image below shows the schematic FCN architecture. The blue boxes represents the VGG-16 encoder and the orange boxes the added decoder layers.
+The Fully Convolutional Network (FCN) is based on a pre-rained VGG-16 image classification network. The VGG-16 network acts as a encoder. In order to implement the decoder, I extracted layer 3, 4 and 7 from the VGG-16 ([`main.py` line 81](https://github.com/harithatavarthy/CarND-Semantic-Segmentation/blob/master/main.py#L81)) network and implemented several upsampling and skip connections ([`main.py` line 116](https://github.com/harithatavarthy/CarND-Semantic-Segmentation/blob/master/main.py#L116)). The image below shows the schematic Decoder architecture. 
 
 ![Decoder architecture][image_Decoder]
 
-- `layer_7_conv_1x1`: conv2d(kernel_size=1, strides=1)
-- `layer_7_upsampled`: conv2d_transpose(kernel_size=4 and strides=2)
-- `layer_4_conv_1x1`: conv2d(kernel_size=1, strides=1)
-- `layer_4_upsampled`: conv2d_transpose(kernel_size=4 and strides=2)
-- `layer_3_conv_1x1`: conv2d(kernel_size=1, strides=1)
-- `layer_3_upsampled`: conv2d_transpose(kernel_size=16 and strides=8)
-
-Each convolution `conv2d()`and `conv2d_transpose()` has been setup with a kernel initializer (`tf.random_normal_initializer`) and a kernel regularizer (`tf.contrib.layers.l2_regularizer`).
+Each convolution `conv2d()`and `conv2d_transpose()` of the decoder has been setup with a kernel initializer (`tf.truncated_normal_initializer`) and a kernel regularizer (`tf.contrib.layers.l2_regularizer`). This will ensure quick convergence of training loss as well as elimination of features that are least importance for learning.
 
 ## Training on AWS EC2 Instance
 The FCN has been trained on an Amazon Web Services (AWS) EC2 g2.2xlarge instance with the following hardware configuration.
