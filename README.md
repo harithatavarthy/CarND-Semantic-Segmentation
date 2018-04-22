@@ -10,9 +10,9 @@
 
 
 ## Introduction
-The goal of this project is to label the pixels of a road in the given testimages with about 80% accuracy, using a Fully Convolutional Network (FCN).  as described in the paper [Fully Convolutional Networks for Semantic Segmentation](https://people.eecs.berkeley.edu/%7Ejonlong/long_shelhamer_fcn.pdf) by Jonathan Long, Evan Shelhamer, and Trevor Darrell from UC Berkeley. The projects is based on [Udacity's starter project](https://github.com/darienmt/CarND-Semantic-Segmentation-P2).
+The goal of this project is to label the pixels of a road from the given test images with about 80% accuracy, using a Fully Convolutional Network (FCN). The projects is based on [Udacity's starter project](https://github.com/darienmt/CarND-Semantic-Segmentation-P2).
 
-A semantic segmentation  model is build on top of a VGG-16 image classifer to retain the spatial information and then upsample to the original image size. Once the model is build, it has been trained by tuning hyper parameters in such a way that the overall loss of the model is minimized. After model is trained to reasonably sufficient levels, inferences are made against the test data/images.
+A semantic segmentation  model is build on top of a VGG-16 image classifer to retain the spatial information and then upsampled in stages to the original image size. Once the model is build, it has been trained by tuning hyper parameters in such a way that the overall loss of the model is minimized. After the model is trained to reasonably sufficient levels, inferences are made against the test data/images.
 
 The following image shows exemplarily the result of the VGG-16 based FCN which has been trained to determine road (green) and non-road (not marked) areas.
 
@@ -24,7 +24,7 @@ The Fully Convolutional Network (FCN) is based on a pre-rained VGG-16 image clas
 
 ![Decoder architecture][image_Decoder]
 
-Each convolution `conv2d()`and `conv2d_transpose()` of the decoder has been setup with a kernel initializer (`tf.truncated_normal_initializer`) and a kernel regularizer (`tf.contrib.layers.l2_regularizer`). This will ensure quick convergence of training loss as well as elimination of features that are least importance for learning.
+Each convolution `conv2d()`and `conv2d_transpose()` of the decoder has been setup with a kernel initializer (`tf.truncated_normal_initializer`) and a kernel regularizer (`tf.contrib.layers.l2_regularizer`). This will ensure quick convergence of training loss as well as elimination of features that are of least importance for learning.
 
 ## Training on AWS EC2 Instance
 The FCN has been trained on an Amazon Web Services (AWS) EC2 g3.4xlarge instance with the following hardware configuration.
@@ -34,7 +34,7 @@ The FCN has been trained on an Amazon Web Services (AWS) EC2 g3.4xlarge instance
 - 7.5 GB RAM
 - 100 GB SSD
 
-I have created this EC2 using  community AMI provided by udacity-carnd-advanced-deep-learning (ami-effbaa94).
+I have created this EC2 using the community AMI provided by udacity-carnd-advanced-deep-learning (ami-effbaa94).
 By using this AMI, one need not worry about complexity invovled in creating the environment required to train and run the model.
 
 
@@ -63,13 +63,13 @@ As training set I used the [Kitti Road dataset](http://www.cvlibs.net/datasets/k
 
 In order to arrive at the optimal model, i trained the model several times with multiple combinations of the above hyperparameters with varied values. Below are some of the observations.
 
-a. With a bigger batch size, time taken for each iteration of training was less but the number of iterations required to arrive at high levels of accuracy was more
+a. With a bigger batch size, time taken for each iteration of training is less but the number of iterations required to arrive at higher levels of accuracy was more
 
-b. Smaller batch size resulted in iterations with increased divergence in training loss making it unreliable.
+b. Smaller batch size resulted in iterations with increased divergence in training loss making the overall training unreliable.
 
-c. Higher values for L2_REG resulted in increased penalization of features resulting in losing valuable information
+c. Higher values for L2_REG resulted in increased penalization of certain features, resulting in losing valuable information required for training the model
 
-d. Lower values for L2_REG resulted in noise
+d. Lower values for L2_REG resulted in increased noise
 
 e. Very low values for learning rate increased the overall training time
 
