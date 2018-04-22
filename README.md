@@ -3,9 +3,9 @@
 
 [//]: # (Image References)
 [image_example]: ./runs/1524341126.2543495/um_000008.png
-[image_Decoder]: ./SemanticSegmentation_Decoder.png
-[image_loss]: ./Loss.png
-[image_accuracy]: ./Accuracy.png
+[image_Decoder]: ./images/SemanticSegmentation_Decoder.png
+[image_loss]: ./images/Loss.png
+[image_accuracy]: ./images/Accuracy.png
 
 
 ## Introduction
